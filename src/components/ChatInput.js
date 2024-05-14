@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 export const ChatInput = ({ onSendMessage }) => {
   const [content, setContent] = useState();
+  const [isComposing, setIsComposing] = useState(false);
 
   // 입력창의 속성을 참조하기 위한 ref
   const textareaRef = useRef(null);
@@ -11,8 +12,19 @@ export const ChatInput = ({ onSendMessage }) => {
   // 입력창의 내용이 변경되면 content 를 입력창의 값으로 변경한다
   const handleChange = (e) => {
     const value = e.target.value;
+    console.log('인풋', value)
     setContent(value);
   };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
+
+
 
   // 전송 버튼을 눌렀을 때 실행되는 함수
   const handleSend = () => {
@@ -23,6 +35,7 @@ export const ChatInput = ({ onSendMessage }) => {
 
     // 입력창의 내용을 onSend 함수를 통해 전달한다
     // 입력창의 내용은 사용자의 메시지이므로 role 을 user 로 설정한다
+    console.log(content)
     onSendMessage({ role: "user", parts: [{ text: content }] });
     // 전달 후 입력창의 내용을 초기화한다
     setContent("");
@@ -31,8 +44,9 @@ export const ChatInput = ({ onSendMessage }) => {
   // 입력창에서 엔터키를 눌렀을 때 실행되는 함수
   // 엔터키를 누르면 전송 버튼을 누른 것과 동일한 효과를 낸다
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
+      console.log('엔터', content)
       handleSend();
     }
   };
@@ -56,6 +70,8 @@ export const ChatInput = ({ onSendMessage }) => {
         value={content}
         rows={1}
         onChange={handleChange}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         onKeyDown={handleKeyDown}
       />
 
