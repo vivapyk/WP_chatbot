@@ -12,7 +12,6 @@ export const ChatInput = ({ onSendMessage }) => {
   // 입력창의 내용이 변경되면 content 를 입력창의 값으로 변경한다
   const handleChange = (e) => {
     const value = e.target.value;
-    console.log('인풋', value)
     setContent(value);
   };
 
@@ -35,7 +34,6 @@ export const ChatInput = ({ onSendMessage }) => {
 
     // 입력창의 내용을 onSend 함수를 통해 전달한다
     // 입력창의 내용은 사용자의 메시지이므로 role 을 user 로 설정한다
-    console.log(content)
     onSendMessage({ role: "user", parts: [{ text: content }] });
     // 전달 후 입력창의 내용을 초기화한다
     setContent("");
@@ -46,7 +44,6 @@ export const ChatInput = ({ onSendMessage }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
-      console.log('엔터', content)
       handleSend();
     }
   };

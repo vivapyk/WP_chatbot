@@ -4,6 +4,20 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
 import { Chat } from "@/components/Chat";
+import { db } from "@/firebase/index"
+import {
+  collection,
+  query,
+  doc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  orderBy,
+  where,
+  getDoc, cdb
+} from "firebase/firestore";
+import { nanoid } from "nanoid";
 
 export default function Home() {
   /*
@@ -18,8 +32,24 @@ export default function Home() {
     ]
   */
   const [messages, setMessages] = useState([]);
+
+
+  /*
+  [
+    {
+      id:
+      messages: []
+      createdAt: 
+    }, ...
+
+  ] */
+
+  const [messageHistory, setMessageHistory] = useState([]);
   // 메시지를 전송 중인지 여부를 저장하는 상태
   const [loading, setLoading] = useState(false);
+
+  const messageCollection = collection(db, "messages")
+
 
   const messagesEndRef = useRef(null);
 
@@ -72,6 +102,12 @@ export default function Home() {
     // 로딩 상태를 해제하고, 메시지 목록에 응답을 추가
     setLoading(false);
     setMessages((messages) => [...messages, result]);
+
+    addDoc(messageCollection, {
+      id: messageHistory[messageHistory.length - 1].id,
+      messages: updatedMessages,
+      createdAt: messageHistory[messageHistory.length - 1].createdAt,
+    });
   };
 
   // 메시지 목록을 초기화하는 함수
@@ -87,12 +123,26 @@ export default function Home() {
 
   // 메시지 목록이 업데이트 될 때마다 맨 아래로 스크롤
   useEffect(() => {
+
     scrollToBottom();
   }, [messages]);
+
+  const updateMessageHistory = async () => {
+    const q = query(messageCollection, orderBy("createdAt", "asc"));
+    const results = await getDocs(q)
+    const history = results.docs.map((doc) => doc.data())
+
+    setMessageHistory([...history, {
+      id: nanoid(),
+      messages,
+      createdAt: new Date()
+    }])
+  }
 
   // 컴포넌트가 처음 렌더링 될 때 메시지 목록을 초기화
   useEffect(() => {
     handleReset();
+    updateMessageHistory()
   }, []);
 
   return (
