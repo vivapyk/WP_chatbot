@@ -49,7 +49,7 @@ export async function POST(req) {
   });
 
   const result = await chat.sendMessage("");
-  const response = await result.response;
+  const response = result.response;
   const text = response.text();
   console.log(response.candidates[0].content);
   //   console.log(response.candidates[0].safetyRatings);
